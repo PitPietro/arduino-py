@@ -31,6 +31,25 @@ class RemoteShield:
             print(pot_1_press)
             time.sleep(0.2)
 
+    def joy_draw(self):
+        it = util.Iterator(board)
+        it.start()
+        pen = turtle.Turtle()
+        pen.home()
+
+        while True:
+            x = round(self.x_axis.read(), 1)
+            y = round(self.y_axis.read(), 1)
+
+            if x > 0.5:
+                new_pos = pen.xcor() + 10
+                pen.setx(new_pos)
+            elif x < 0.5:
+                new_pos = pen.xcor() - 10
+                pen.setx(new_pos)
+            print(x, '  ', y)
+            time.sleep(0.1)
+
     def drawing(self):
         it = util.Iterator(board)
         it.start()
@@ -85,4 +104,5 @@ if __name__ == '__main__':
     print('(x; y)')
     print('TRUE --> NOT pressed\nFALSE --> pressed')
     # my_shield.remote_shield()
-    my_shield.drawing()
+    # my_shield.drawing()
+    my_shield.joy_draw()
