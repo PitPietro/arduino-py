@@ -1,4 +1,5 @@
 from pyfirmata import util, Arduino
+import turtle
 import time
 
 
@@ -30,12 +31,42 @@ class RemoteShield:
             print(pot_1_press)
             time.sleep(0.2)
 
-    @staticmethod
-    def analog_state(analog_input):
-        if analog_input.read():
-            return 'UP'
-        else:
-            return 'DOWN'
+    def drawing(self):
+        it = util.Iterator(board)
+        it.start()
+        pen = turtle.Turtle()
+        pen.home()
+        move_n = 50
+        iterator = 0
+        while True:
+            s1_v = self.s1.read()
+            s2_v = self.s2.read()
+            s3_v = self.s3.read()
+            joy_v = self.joy_press.read()
+            if not s1_v:
+                move_n *= -1
+            if not s2_v:
+                new_pos = pen.ycor() + move_n
+                pen.sety(new_pos)
+            if not s3_v:
+                new_pos = pen.xcor() + move_n
+                pen.setx(new_pos)
+            if not joy_v:
+                iterator += 1
+                if iterator % 2 == 0:
+                    pen.up()
+                else:
+                    pen.down()
+            print('default: {}| ({} ; {})| <-> {}| ^ {} | i : {}'
+                  .format(move_n, pen.xcor(), pen.ycor(), s3_v, s2_v, iterator))
+            time.sleep(0.1)
+
+
+def analog_state(analog_input):
+    if analog_input.read():
+        return 'UP'
+    else:
+        return 'DOWN'
 
 
 if __name__ == '__main__':
@@ -53,5 +84,5 @@ if __name__ == '__main__':
 
     print('(x; y)')
     print('TRUE --> NOT pressed\nFALSE --> pressed')
-    my_shield.remote_shield()
-    # remote_shield()
+    # my_shield.remote_shield()
+    my_shield.drawing()
