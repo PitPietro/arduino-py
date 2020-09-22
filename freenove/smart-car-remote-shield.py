@@ -2,6 +2,8 @@ from pyfirmata import util, Arduino
 import turtle
 import time
 
+MIDDLE = 0.5
+
 
 class RemoteShield:
     def __init__(self, pot_1, pot_2, x_axis, y_axis, joy_press, s1, s2, s3):
@@ -41,12 +43,20 @@ class RemoteShield:
             x = round(self.x_axis.read(), 1)
             y = round(self.y_axis.read(), 1)
 
-            if x > 0.5:
+            if x > MIDDLE:
                 new_pos = pen.xcor() + 10
                 pen.setx(new_pos)
-            elif x < 0.5:
+            elif x < MIDDLE:
                 new_pos = pen.xcor() - 10
                 pen.setx(new_pos)
+
+            if y < MIDDLE:
+                new_pos = pen.ycor() + 10
+                pen.sety(new_pos)
+            elif y > MIDDLE:
+                new_pos = pen.ycor() - 10
+                pen.sety(new_pos)
+
             print(x, '  ', y)
             time.sleep(0.1)
 
