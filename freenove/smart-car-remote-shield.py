@@ -38,27 +38,34 @@ class RemoteShield:
         it.start()
         pen = turtle.Turtle()
         pen.home()
+        pen_l = 1
 
         while True:
             x = round(self.x_axis.read(), 1)
             y = round(self.y_axis.read(), 1)
+            s1_v = self.s1.read()
 
             if x > MIDDLE:
-                new_pos = pen.xcor() + 10
+                new_pos = pen.xcor() + pen_l
                 pen.setx(new_pos)
             elif x < MIDDLE:
-                new_pos = pen.xcor() - 10
+                new_pos = pen.xcor() - pen_l
                 pen.setx(new_pos)
 
             if y < MIDDLE:
-                new_pos = pen.ycor() + 10
+                new_pos = pen.ycor() + pen_l
                 pen.sety(new_pos)
             elif y > MIDDLE:
-                new_pos = pen.ycor() - 10
+                new_pos = pen.ycor() - pen_l
                 pen.sety(new_pos)
 
+            if s1_v:
+                pen.down()
+            else:
+                pen.up()
+
             print(x, '  ', y)
-            time.sleep(0.1)
+            time.sleep(0.001)
 
     def drawing(self):
         it = util.Iterator(board)
