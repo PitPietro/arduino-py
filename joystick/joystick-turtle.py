@@ -2,6 +2,8 @@ from pyfirmata import util, Arduino
 import turtle
 import time
 
+from utils import analog_state
+
 MIDDLE = 0.5
 
 
@@ -25,6 +27,9 @@ class MyTurtle:
         self.s1 = s1
         self.s2 = s2
         self.s3 = s3
+        self.btn_counter = 0
+        self.btn_state = 0
+        self.btn_prev_state = 0
 
     def joy_draw(self):
         it = util.Iterator(board)
@@ -36,7 +41,7 @@ class MyTurtle:
         while True:
             x = round(self.x_axis.read(), 1)
             y = round(self.y_axis.read(), 1)
-            s1_v = self.s1.read()
+            self.btn_state = self.joy_press.read()
 
             if x > MIDDLE:
                 new_pos = pen.xcor() + pen_l
@@ -52,20 +57,25 @@ class MyTurtle:
                 new_pos = pen.ycor() - pen_l
                 pen.sety(new_pos)
 
-            if s1_v:
+            # detect the state of pressure of the JoyStick
+            if self.btn_state != self.btn_prev_state:
+                if analog_state(self.btn_state) == 'UP':
+                    self.btn_counter += 1
+                    print('Btn UP --> HIGH\nNumber of button pushes: ', self.btn_counter)
+                else:
+                    print('Btn DOWN --> LOW')
+
+                time.sleep(0.05)
+
+            # save the current state as the last state, for next time through the loop
+            self.btn_prev_state = self.btn_state
+
+            if self.btn_counter % 2 == 0:
                 pen.down()
             else:
                 pen.up()
-
             print(x, '  ', y)
             time.sleep(0.001)
-
-
-def analog_state(analog_input):
-    if analog_input.read():
-        return 'UP'
-    else:
-        return 'DOWN'
 
 
 if __name__ == '__main__':
@@ -82,3 +92,4 @@ if __name__ == '__main__':
     print('(x; y)')
     print('TRUE --> NOT pressed\nFALSE --> pressed')
     my_shield.joy_draw()
+    #TODO read the value of the switch on led 7: it is not an analog value

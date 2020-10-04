@@ -2,9 +2,11 @@ from pyfirmata import util, Arduino
 import turtle
 import time
 
+from utils import analog_state
+
 MIDDLE = 0.5
 
-
+# https://github.com/home-assistant/core/pull/14174
 class RemoteShield:
     def __init__(self, pot_1, pot_2, x_axis, y_axis, joy_press, s1, s2, s3):
         self.pot_1 = pot_1
@@ -33,77 +35,6 @@ class RemoteShield:
             print(pot_1_press)
             time.sleep(0.2)
 
-    def joy_draw(self):
-        it = util.Iterator(board)
-        it.start()
-        pen = turtle.Turtle()
-        pen.home()
-        pen_l = 1
-
-        while True:
-            x = round(self.x_axis.read(), 1)
-            y = round(self.y_axis.read(), 1)
-            s1_v = self.s1.read()
-
-            if x > MIDDLE:
-                new_pos = pen.xcor() + pen_l
-                pen.setx(new_pos)
-            elif x < MIDDLE:
-                new_pos = pen.xcor() - pen_l
-                pen.setx(new_pos)
-
-            if y < MIDDLE:
-                new_pos = pen.ycor() + pen_l
-                pen.sety(new_pos)
-            elif y > MIDDLE:
-                new_pos = pen.ycor() - pen_l
-                pen.sety(new_pos)
-
-            if s1_v:
-                pen.down()
-            else:
-                pen.up()
-
-            print(x, '  ', y)
-            time.sleep(0.001)
-
-    def drawing(self):
-        it = util.Iterator(board)
-        it.start()
-        pen = turtle.Turtle()
-        pen.home()
-        move_n = 50
-        iterator = 0
-        while True:
-            s1_v = self.s1.read()
-            s2_v = self.s2.read()
-            s3_v = self.s3.read()
-            joy_v = self.joy_press.read()
-            if not s1_v:
-                move_n *= -1
-            if not s2_v:
-                new_pos = pen.ycor() + move_n
-                pen.sety(new_pos)
-            if not s3_v:
-                new_pos = pen.xcor() + move_n
-                pen.setx(new_pos)
-            if not joy_v:
-                iterator += 1
-                if iterator % 2 == 0:
-                    pen.up()
-                else:
-                    pen.down()
-            print('default: {}| ({} ; {})| <-> {}| ^ {} | i : {}'
-                  .format(move_n, pen.xcor(), pen.ycor(), s3_v, s2_v, iterator))
-            time.sleep(0.1)
-
-
-def analog_state(analog_input):
-    if analog_input.read():
-        return 'UP'
-    else:
-        return 'DOWN'
-
 
 if __name__ == '__main__':
     board = Arduino('/dev/ttyACM0')
@@ -120,6 +51,4 @@ if __name__ == '__main__':
 
     print('(x; y)')
     print('TRUE --> NOT pressed\nFALSE --> pressed')
-    # my_shield.remote_shield()
-    # my_shield.drawing()
-    my_shield.joy_draw()
+    my_shield.remote_shield()
